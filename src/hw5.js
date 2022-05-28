@@ -77,8 +77,14 @@ const wing = {}
 wing.color = 0x254d65;
 wing.height = 1;
 wing.width = 0.5;
+wing.geometry = new THREE.BufferGeometry();
+const wingVertices = new Float32Array( [
+	wing.height, -wing.width,  0.0,
+	wing.width, -wing.width,  0.0,
+	wing.width,  wing.height,  0.0,
+] );
+wing.geometry.setAttribute( 'position', new THREE.BufferAttribute( wingVertices, 3 ) );
 wing.material = createMaterial(new THREE.MeshBasicMaterial({color: wing.color}))
-wing.geometry = new THREE.PlaneGeometry(wing.height, wing.width)
 wing.material.side = THREE.DoubleSide
 
 // First wing
@@ -155,6 +161,9 @@ renderer.render( scene, camera );
 const controls = new OrbitControls( camera, renderer.domElement );
 
 let isOrbitEnabled = true; 
+let isAnimation1 = false;
+let isAnimation2 = false;
+let isAnimation3 = false;
 
 const toggleOrbit = (e) => {
 	if (e.key == "o"){
@@ -162,10 +171,43 @@ const toggleOrbit = (e) => {
 	}
 }
 
+//animation functions
 
+let animation1 = (e) => {
+	if (e.key == "1") {
+		console.log("animation1")
+		isAnimation1 = !isAnimation1
+		const shipRotateZ = new THREE.Matrix4();
+		shipRotateZ.makeRotationZ(degrees_to_radians(1));
+		spaceship.applyMatrix4(shipRotateZ);
+	}
+}
+
+let animation2 = (e) => {
+	if (e.key == "2") {
+		console.log("animation 2")
+		isAnimation2 = !isAnimation2
+		const shipRotateY = new THREE.Matrix4();
+		shipRotateY.makeRotationY(degrees_to_radians(1));
+		spaceship.applyMatrix4(shipRotateY)
+	}
+}
+
+let animation3 = (e) => {
+	if (e.key == "3") {
+		console.log("animation 3")
+		isAnimation3 = !isAnimation3
+		const animation3Matrix = new THREE.Matrix4();
+		animation3Matrix.makeTranslation(-0.05,0,-0.05);
+		spaceship.applyMatrix4(animation3Matrix)
+	}
+}
 
 document.addEventListener('keydown',toggleOrbit)
 document.addEventListener('keydown',toggleWireframe)
+document.addEventListener('keydown',animation1)
+document.addEventListener('keydown',animation2)
+document.addEventListener('keydown',animation3)
 
 //controls.update() must be called after any manual changes to the camera's transform
 controls.update();
