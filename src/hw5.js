@@ -18,17 +18,6 @@ function degrees_to_radians(degrees)
 let isWireframeEnabled = false; // Flag that determines whether the wireframe should be enabled or not.
 let materialsList = []; // Holds all the materials in the scene to support wireframe toggling on and off.
 
-// This function toggles the wireframe view for all the objects in the scene
-let toggleWireframe = (e) => {
-	if (e.key == "w") {
-		console.log("Toggling wireframe")
-		isWireframeEnabled = !isWireframeEnabled
-		for (let material of materialsList) {
-			material.wireframe = isWireframeEnabled
-		}
-	}
-}
-
 // A wrapper function to make sure that all of the mateirals that are being created 
 // for this scene, will be stored in materialsList variable to support wireframe toggling.
 const createMaterial = (material) => {
@@ -40,18 +29,18 @@ const spaceship = new THREE.Group();
 
 // Constant geometries sizes
 const sizes = {}
-sizes.hullRadius = 0.5; // TODO: CHANGE TO REAL VALUE
+sizes.hullRadius = 0.5; 
 sizes.hullLength = 3 * sizes.hullRadius
 
 sizes.headRadius = sizes.hullRadius 
 sizes.headLength = 2 * sizes.hullRadius
 
-sizes.shipSize = 1; // TODO: CHANGE TO REAL VALUE
+sizes.shipSize = sizes.hullRadius + sizes.headRadius; 
 sizes.planetSize = 5 * sizes.shipSize
 
 // Ship's Hull (Cylinder)
 const hull = {}
-hull.color = 0x049ef4 // TODO: CHANGE !!!
+hull.color = 0x00739C;
 hull.material = createMaterial(new THREE.MeshBasicMaterial({color: hull.color}))
 hull.geometry = new THREE.CylinderGeometry(sizes.hullRadius, sizes.hullRadius, sizes.hullLength)
 hull.mesh = new THREE.Mesh(hull.geometry, hull.material)
@@ -59,7 +48,7 @@ spaceship.add(hull.mesh)
 
 // Ship's Head (Cone)
 const head = {}
-head.color = 0xd10000;
+head.color = 0xAE0000;
 head.material = createMaterial(new THREE.MeshBasicMaterial({color: head.color}))
 head.geometry = new THREE.ConeGeometry(sizes.headRadius, sizes.headLength)
 head.mesh = new THREE.Mesh(head.geometry, head.material)
@@ -72,7 +61,7 @@ head.mesh.applyMatrix4(moveHeadMat)
 // Ship's wings (Two-sided mesh plane)
 const wings = new THREE.Group()
 const wing = {}
-wing.color = 0x254d65;
+wing.color = 0x443152;
 wing.height = 1;
 wing.width = 0.5;
 wing.geometry = new THREE.BufferGeometry();
@@ -112,7 +101,7 @@ const shipWindows = new THREE.Group()
 const shipWindow = {}
 shipWindow.color = 0xffff00;
 shipWindow.material = createMaterial(new THREE.MeshBasicMaterial({color: shipWindow.color}))
-shipWindow.geometry = new THREE.RingGeometry(0.05, 0.15, 30)
+shipWindow.geometry = new THREE.RingGeometry(0.1, 0.15, 30)
 
 // First Window
 shipWindow.mesh = new THREE.Mesh(shipWindow.geometry, shipWindow.material)
@@ -138,12 +127,12 @@ scene.add(spaceship)
 
 // Planet (Sphere)
 const planet = {}
-planet.color = 0x04f6ba;
+planet.color = 0xD3D3D3;
 planet.material = createMaterial(new THREE.MeshBasicMaterial({color: planet.color}))
-planet.geometry = new THREE.SphereGeometry(1, 64, 32)
+planet.geometry = new THREE.SphereGeometry(sizes.planetSize / 2, 64, 32)
 planet.mesh = new THREE.Mesh(planet.geometry, planet.material)
 const movePlanetMat = new THREE.Matrix4()
-movePlanetMat.makeTranslation(-2, 0 , 0)
+movePlanetMat.makeTranslation(-5, 0 , 0)
 planet.mesh.applyMatrix4(movePlanetMat)
 scene.add(planet.mesh)
 
@@ -156,6 +145,8 @@ camera.applyMatrix4(cameraTranslate)
 
 renderer.render( scene, camera );
 
+// ============================================================================================
+//animation functions
 const controls = new OrbitControls( camera, renderer.domElement );
 
 let isOrbitEnabled = true; 
@@ -169,11 +160,18 @@ const toggleOrbit = (e) => {
 	}
 }
 
-// ============================================================================================
-//animation functions
+const toggleWireframe = (e) => {
+	if (e.key == "w") {
+		console.log("Toggling wireframe")
+		isWireframeEnabled = !isWireframeEnabled
+		for (let material of materialsList) {
+			material.wireframe = isWireframeEnabled
+		}
+	}
+}
 
 const transAnimation = new THREE.Matrix4();
-transAnimation.makeTranslation(2.5,0,0);
+transAnimation.makeTranslation(2+sizes.planetSize ,0,0);
 const transAnimationInvert = new THREE.Matrix4();
 transAnimationInvert.copy(transAnimation).invert()
 
