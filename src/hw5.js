@@ -14,7 +14,6 @@ function degrees_to_radians(degrees)
   return degrees * (pi/180);
 }
 
-
 // ============================================================================================
 let isWireframeEnabled = false; // Flag that determines whether the wireframe should be enabled or not.
 let materialsList = []; // Holds all the materials in the scene to support wireframe toggling on and off.
@@ -50,7 +49,6 @@ sizes.headLength = 2 * sizes.hullRadius
 sizes.shipSize = 1; // TODO: CHANGE TO REAL VALUE
 sizes.planetSize = 5 * sizes.shipSize
 
-// Add here the rendering of your spaceship
 // Ship's Hull (Cylinder)
 const hull = {}
 hull.color = 0x049ef4 // TODO: CHANGE !!!
@@ -171,15 +169,18 @@ const toggleOrbit = (e) => {
 	}
 }
 
+// ============================================================================================
 //animation functions
+
+const transAnimation = new THREE.Matrix4();
+transAnimation.makeTranslation(2.5,0,0);
+const transAnimationInvert = new THREE.Matrix4();
+transAnimationInvert.copy(transAnimation).invert()
 
 let animation1 = (e) => {
 	if (e.key == "1") {
 		console.log("animation1")
 		isAnimation1 = !isAnimation1
-		const shipRotateZ = new THREE.Matrix4();
-		shipRotateZ.makeRotationZ(degrees_to_radians(1));
-		spaceship.applyMatrix4(shipRotateZ);
 	}
 }
 
@@ -187,9 +188,6 @@ let animation2 = (e) => {
 	if (e.key == "2") {
 		console.log("animation 2")
 		isAnimation2 = !isAnimation2
-		const shipRotateY = new THREE.Matrix4();
-		shipRotateY.makeRotationY(degrees_to_radians(1));
-		spaceship.applyMatrix4(shipRotateY)
 	}
 }
 
@@ -197,9 +195,6 @@ let animation3 = (e) => {
 	if (e.key == "3") {
 		console.log("animation 3")
 		isAnimation3 = !isAnimation3
-		const animation3Matrix = new THREE.Matrix4();
-		animation3Matrix.makeTranslation(-0.05,0,-0.05);
-		spaceship.applyMatrix4(animation3Matrix)
 	}
 }
 
@@ -217,8 +212,29 @@ function animate() {
 	requestAnimationFrame( animate );
 
 	controls.enabled = isOrbitEnabled;
-	controls.update();
+	if (isAnimation1) {
+		let rotateAnimation1 = new THREE.Matrix4();
+		rotateAnimation1.makeRotationZ(degrees_to_radians(1));
+		spaceship.applyMatrix4(transAnimation);
+		spaceship.applyMatrix4(rotateAnimation1);
+		spaceship.applyMatrix4(transAnimationInvert);
+	}
 
+	if (isAnimation2){
+		let rotateAnimation2 = new THREE.Matrix4();
+		rotateAnimation2.makeRotationY(degrees_to_radians(1));
+		spaceship.applyMatrix4(transAnimation);
+		spaceship.applyMatrix4(rotateAnimation2);
+		spaceship.applyMatrix4(transAnimationInvert);
+	}
+
+	if (isAnimation3) {
+		let transAnimation3 = new THREE.Matrix4();
+		transAnimation3.makeTranslation(-0.02,0,-0.02);
+		spaceship.applyMatrix4(transAnimation3)
+	}
+
+	controls.update();
 	renderer.render( scene, camera );
 
 }
